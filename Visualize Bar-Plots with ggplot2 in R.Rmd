@@ -1,0 +1,255 @@
+---
+title: "EDA - bar plots"
+author: "na"
+date: "5/5/2022"
+output: html_document
+---
+
+Data Visualization: Categorical data / Bar-Plot
+
+
+bar plot is a kind of graphs that we use to represent a categorical/discrete variable, by saying categorical, we mean a variable that can take a limited/specific elements on it.
+for example: today you have an exam, we can make some variable from today:
+1) Binary variable: you will pass the exam, or not.
+2) Categorical variable: the day(e.g. Sunday...), exam hour(e.g. 9:00, 13:30, 17:00...)
+And it's also reasonable to add a third data type: Discrete data.
+3) Discrete variables: the number of hours that you slept before the exam, the number of questions in the exam..
+
+So, let's start.
+
+loading the libraries.
+I will try to use only ggplot2 functions, except if the alternative is much easier, and less code to write. 
+plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
+```{r, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(priceR)
+library(dplyr)
+library(forcats)
+library(cowplot)
+```
+
+```{r}
+## reading the data
+###################
+travel <- read.csv('TravelInsurancePrediction.csv')
+## delete irrelevant variables
+##############################
+travel <- select(travel,-X)
+
+## Change data type: Categorical variables
+##########################################
+travel$EmploymentType <- as.factor(travel$Employment.Type)
+travel <- select(travel,-Employment.Type)
+travel$GraduateOrNot <- as.factor(travel$GraduateOrNot)
+travel$ChronicDiseases <- as.factor(travel$ChronicDiseases)
+travel$FrequentFlyer <- as.factor(travel$FrequentFlyer)
+travel$EverTravelledAbroad <- as.factor(travel$EverTravelledAbroad)
+travel$TravelInsurance <- as.factor(travel$TravelInsurance)
+usd_inr <- historical_exchange_rates("INR", to = "USD", start_date = "2019-01-01", end_date = "2019-12-31")[,2]
+travel$AnnualIncome <- travel$AnnualIncome*mean(usd_inr) #from INR currency to USD.
+```
+We will focus on plots, and will use just a couple of variable from travel dataset.
+
+```{r}
+str(travel)
+```
+the variable that I used from the dataset:
+1) TravelInsurance: a binary variable.
+
+## a reminder.
+If you forget one day how to make plot with ggplot2(Please don't...), then you have to remember that you have to pass these three:
+1) ggplot(and_here_the_dataset_name)
+2) aes(x = the_variable_name_that_you_want_to_visualize, y = sec_col...)
+you can pass this aes thing(you should remember this) in ggplot() or geom_..() function.
+3) geom_ the_plot_that_you_want: geom_bar(), geom_boxplot().....
+so you should have:
+ggplot(travel,aes(TravelInsurance)) + geom_bar() |or| ggplot(travel) + geom_bar(aes(TravelInsurance))
+
+
+## The basic bar-plot
+```{r}
+ggplot(travel,aes(TravelInsurance)) + geom_bar()
+```
+
+we can also set the aesthetic in the geom function:
+```{r}
+ggplot(travel) + geom_bar(aes(TravelInsurance))
+```
+
+```{r}
+plot_grid(ggplot(travel,aes(TravelInsurance)) + geom_bar(),
+          ggplot(travel) + geom_bar(aes(TravelInsurance)))
+```
+as we can see: we have the same plot.
+
+### add title, rename labs...
+now we will gonna add a title, change x and y names. We have two options:
+1)
+```{r}
+p0 <- ggplot(travel,aes(TravelInsurance)) + geom_bar()
+A <-  p0 + labs(x = 'x label', y = 'y label', title = 'A plot')
+##
+B <- p0 + xlab('x label') + ylab('y label') + ggtitle('B plot')
+plot_grid(A,B)
+```
+
+other useful stuff with labs function:
+
+```{r}
+p0 + labs(title = 'p title', subtitle = 'p subtitle', tag = 'p0')
+```
+
+### change axis limits\names.
+change y axis limits:
+```{r}
+p0 +  scale_y_continuous(limits=c(0,max(table(travel$TravelInsurance))), #future use: just change df$col
+                         breaks=seq(0,max(table(travel$TravelInsurance)),100)) #you can change the by(100)
+```
+
+
+```{r}
+p0 + scale_x_discrete(labels=c("No", "Yes")) 
+```
+
+Note: since I don't know which category ggplot package will put first, I have to see the plot before changing names.
+there is another way to do this, it's require a little bit of work, but it worth it: create a new column, make the plot and then you can delete it after you got want you want.
+so:
+```{r}
+#col <- rdunif(100,1,4)
+#col_2 <- ifelse(col == 1,'one',ifelse(col==2,'two',ifelse(col == 3, 'three','four')))
+#table(col)
+#table(col_2)
+n_col <- as.factor(ifelse(travel$TravelInsurance == 1,'Yes','No'))
+ggplot(travel,aes(n_col)) + geom_bar() + xlab('Travel Insurance')
+remove(n_col)
+```
+
+
+### change font size, rotate...
+change font size:
+```{r, fig.width=10,fig.height=11}
+plot_grid(p0 + theme(text=element_text(size=20)) + ggtitle('text=element_text(size=20)'),
+          p0 + ggtitle('text=element_text(size=NULL)'),
+          p0 + theme(axis.text=element_text(size=20)) + ggtitle('axis.text=element_text(size=20)'),
+          p0 + ggtitle('axis.text=element_text(size=NULL)'),
+          p0 + theme(axis.title=element_text(size=20)) + ggtitle('axis.title=element_text(size=20)'),
+          p0 + ggtitle('axis.title=element_text(size=NULL)'),
+          p0 + theme(plot.title=element_text(size=20)) + ggtitle('plot.title=element_text(size=20)'),
+          p0 + ggtitle('plot.title=element_text(size=NULL)'),
+          ncol = 2)
+```
+
+
+rotate, change text position:
+```{r}
+r0 <- ggplot(travel, aes(EmploymentType)) + geom_bar()
+plot_grid(r0 + scale_x_discrete(guide = guide_axis(angle = 45)) + ggtitle('guide_axis(angle = 45))'),
+          r0)
+```
+another option:
+```{r, fig.width=10,fig.height=20}
+plot_grid(r0 + theme(axis.text.x=element_text(angle = 0,    #rotate the text
+                                    hjust = 0.5,   #text position from the center -left\right(horizontal)
+                                    vjust = 0)) +  #text position -up\down(vertical)
+                  ggtitle('angle = 0, hjust = 0.5, vjust = 0.5'),
+          r0 + theme(axis.text.x=element_text(angle = 30, hjust = 0.5, vjust = 0.5)) + #plot[1,2]
+                  ggtitle('angle = 30, hjust = 0.5, vjust = 0.5'),
+          r0 + theme(axis.text.x=element_text(angle = 90, hjust = 0, vjust = 0.5)) + #plot[2,1]
+                  ggtitle('angle = 90, hjust = 0, vjust = 0.5'),
+          r0 + theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5)) + #plot[2,2]
+                  ggtitle('angle = 90, hjust = 1, vjust = 0.5'),
+          r0 + theme(axis.text.x=element_text(angle = 90, hjust = 0.5, vjust = 0)) + #plot[3,1]
+                  ggtitle('angle = 90, hjust = 0.5, vjust = 0'),
+          r0 + theme(axis.text.x=element_text(angle = 90, hjust = 0.5, vjust = 1)) + #plot[3,2]
+                  ggtitle('angle = 90, hjust = 0.5, vjust = 1'),
+          r0 + theme(axis.text.x=element_text(angle = 30)) + #plot[4,1]
+                  ggtitle('angle = 30'),
+          ncol = 2)
+```
+
+
+### Horizontal bars.
+Horizontal bar plot:
+```{r}
+r0 + coord_flip()
+```
+
+### other backgrounds.
+change the background:
+```{r}
+p1 <- p0 + labs(x = '',y='')
+plot_grid(p1 + ggtitle('default theme'),
+          p1 + ggtitle('linedraw') + theme_linedraw(),
+          p1 + ggtitle('bw') + theme_bw(),
+          p1 + ggtitle('classic') + theme_classic(),
+          p1 + ggtitle('cowplot') + theme_cowplot(),
+          p1 + ggtitle('dark') + theme_dark(),
+          p1 + ggtitle('get') + theme_get(),
+          p1 + ggtitle('gray') + theme_gray(),
+          p1 + ggtitle('minimal') + theme_minimal())
+```
+### color the bars.
+change colors:
+```{r}
+ggplot(travel,aes(TravelInsurance)) + geom_bar(fill = 'lightblue',color = 'black')
+```
+you can choose any color you want to. link to more colors:
+
+
+### set the order.
+reorder the bars by count:
+we can do this plot we less code with forcats library:
+```{r}
+#library(forcats)
+plot_grid(ggplot(travel,aes(x = fct_infreq(as.factor(FamilyMembers)))) + geom_bar() +
+            #labs(x = "FamilyMembers") +
+                  ggtitle('fct_infreq: highest to lowest'),
+          ggplot(travel,aes(x = fct_rev(fct_infreq(as.factor(FamilyMembers))))) + geom_bar() +
+            labs(x = "FamilyMembers") +
+                  ggtitle('fct_rev: lowest to highest'))
+```
+
+### add count, percentage...
+add count:
+```{r, fig.width=10,fig.height=10}
+c0 <-  ggplot(travel,aes(TravelInsurance)) + geom_bar(fill = 'lightblue',color = 'black')
+
+plot_grid(c0 + geom_text(stat='count', aes(label=..count..)) + ggtitle('defaut vjust'),
+          c0 + geom_text(stat='count', aes(label=..count..), vjust = 0) + ggtitle('vjust = 0'),
+          c0 + geom_text(stat='count', aes(label=..count..), vjust = 1) + ggtitle('vjust = 1'),
+          c0 + geom_text(stat='count', aes(label=..count..), vjust = 0.2) + ggtitle('vjust = 0.2'))
+```
+
+add percentage:
+```{r}
+c0 + geom_text(stat='count', aes(label = scales::percent(..count../sum(..count..))), vjust = 1)
+```
+count and proportion:
+```{r}
+c0 + geom_text(stat = "count",aes(label = paste(..count..," (",scales::percent(..count../sum(..count..)),")", sep = "")),
+             vjust = 1)
+```
+
+that's for bar plot with one variable, now we will see bar plots with more than one.
+
+## a second categorical variable
+second variable: categorical variable.
+color by another variable:
+```{r}
+plot_grid(ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)),
+          ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad), position="dodge"))
+```
+
+### change colors and legend position
+the colors changes by the second variable.
+```{r}
+ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
+        scale_fill_manual(values=c('grey','lightblue')) +
+        theme(legend.position="top")
+```
+
+
+
+
+
+
