@@ -240,12 +240,18 @@ plot_grid(ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravell
           ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad), position="dodge"))
 ```
 
-### change colors and legend position
+### change colors and legend positions
 the colors changes by the second variable.
 ```{r}
-ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
-        scale_fill_manual(values=c('grey','lightblue')) +
-        theme(legend.position="top")
+plot_grid(ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
+        theme(legend.position="top") + scale_fill_manual(values=c('grey','lightblue')) + ggtitle('position = top'),
+        ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
+        theme(legend.position="down") + scale_fill_manual(values=c('grey','lightblue')) + ggtitle('position = down'),
+        ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
+        theme(legend.position="left") + scale_fill_manual(values=c('grey','lightblue')) + ggtitle('position = left'),
+        ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
+        theme(legend.position="right") + scale_fill_manual(values=c('grey','lightblue')) + ggtitle('position = right'),
+        ncol = 2)
 ```
 
 
