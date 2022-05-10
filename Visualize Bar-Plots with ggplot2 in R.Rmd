@@ -45,6 +45,7 @@ travel$ChronicDiseases <- as.factor(travel$ChronicDiseases)
 travel$FrequentFlyer <- as.factor(travel$FrequentFlyer)
 travel$EverTravelledAbroad <- as.factor(travel$EverTravelledAbroad)
 travel$TravelInsurance <- as.factor(travel$TravelInsurance)
+travel$FamilyMembers <- as.factor(travel$FamilyMembers)
 usd_inr <- historical_exchange_rates("INR", to = "USD", start_date = "2019-01-01", end_date = "2019-12-31")[,2]
 travel$AnnualIncome <- travel$AnnualIncome*mean(usd_inr) #from INR currency to USD.
 ```
@@ -196,6 +197,8 @@ ggplot(travel,aes(TravelInsurance)) + geom_bar(fill = 'lightblue',color = 'black
 you can choose any color you want to. link to more colors:
 
 
+
+
 ### set the order.
 reorder the bars by count:
 we can do this plot we less code with forcats library:
@@ -280,12 +283,15 @@ ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad))
 
 ## add count by first and second variable (x / fill)
 
-```{r}
+```{r, fig.width=10,fig.height=10}
 plot_grid(ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravelledAbroad)) + 
         geom_text(stat='count', aes(label=..count..), vjust = 1) + theme(legend.position = 'none'),
         
         ggplot(travel, aes(EverTravelledAbroad, fill = TravelInsurance)) + geom_bar(position="dodge") + 
-        geom_text(stat='count', aes(label=..count..), position =  position_dodge(1)) + theme(legend.position = 'none'))
+        geom_text(stat='count', aes(label=..count..), position =  position_dodge(0.9), vjust = 1.5) + theme(legend.position = 'none'),
+        ggplot(travel, aes(EverTravelledAbroad, fill = TravelInsurance)) + geom_bar() + 
+        geom_text(stat='count', aes(label=..count..)) + theme(legend.position = 'none'),
+        ncol = 2)
 ```
 
 
@@ -294,10 +300,53 @@ plot_grid(ggplot(travel, aes(TravelInsurance)) + geom_bar(aes(fill = EverTravell
 ```{r}
 ggplot(travel) + 
         geom_bar(aes(EverTravelledAbroad, fill = TravelInsurance), position="dodge") + 
-        geom_text(stat='count', aes(x = EverTravelledAbroad, fill = TravelInsurance, label=..count..), position =  position_dodge(1)) + theme(legend.position = 'none') +
+        theme(legend.position = 'none') +
+        geom_text(stat='count', aes(x = EverTravelledAbroad, fill = TravelInsurance, label=..count..),
+                  position =  position_dodge(1), vjust = 1) + 
         geom_text(stat = "count", aes(x = EverTravelledAbroad,label=paste(round((..count..) / sum(..count..),3)*100,'%')),
-                  position = position_stack(-0.01))
+                  position = position_fill(0))
 ```
 more work needed here
+
+```{r}
+ggplot(travel) + geom_bar(aes(fill = FamilyMembers,x = TravelInsurance)) + scale_fill_brewer()
+```
+
+
+
+```{r}
+ggplot(travel, aes(FamilyMembers)) +
+        geom_bar(aes(fill = TravelInsurance), position="fill") + ylab('percent') +
+        scale_fill_brewer(palette = "Greens") + 
+        geom_text(stat = "count", aes(x = FamilyMembers,label=paste(round((..count..) / sum(..count..),3)*100,'%')),
+                  position = position_fill(vjust = -0.05)) +
+        geom_text(stat = 'count', aes(x = FamilyMembers, fill = TravelInsurance, label=..count..), position =  position_fill(0.9))
+```
+
+```{r}
+ggplot(travel, aes(FamilyMembers)) +
+        geom_bar(aes(fill = TravelInsurance), position="fill") + ylab('percent') +
+        scale_fill_brewer(palette = "Greens") + 
+        geom_text(stat = "count", aes(x = FamilyMembers,
+                                      label= paste(..count..," (",round((..count../sum(..count..)),3)*100,"%)", sep = "")),
+                  position = position_fill(vjust = -0.1), angle = 20) +
+        geom_text(stat = 'count', aes(x = FamilyMembers, fill = TravelInsurance, label=..count..), position =  position_fill(0.9))
+```
+
+
+
+```{r}
+df <- data.frame(table(travel$FamilyMembers))
+colnames(df) <- c('FamilyMembers','count_members')
+ggplot(travel, aes(FamilyMembers)) +
+        geom_bar(aes(fill = TravelInsurance), position="fill") + ylab('percent') +
+        scale_fill_brewer(palette = "Greens") + 
+        geom_text(stat = 'count', aes(x = FamilyMembers, fill = TravelInsurance, label=..count..), position =  position_fill(0.9)) +
+        scale_y_continuous("percent", sec.axis = sec_axis(~.*100, name = "count")) +
+        geom_line(data = df, aes(x=FamilyMembers, y=count_members), group = 1)
+```
+next: plot both bars and line
+
+
 
 
