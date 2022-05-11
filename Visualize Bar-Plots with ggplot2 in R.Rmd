@@ -1,25 +1,30 @@
 ---
-title: "EDA - bar plots"
-author: "na"
+title: "EDA - Bar-Plots"
+author: "Khaled Sobeh"
 date: "5/5/2022"
 output: html_document
 ---
 
-Data Visualization: Categorical data / Bar-Plot
+Data Visualization: Bar-Plot / Binary, Categorical, Ordinal, Discrete data types.
 
 
-bar plot is a kind of graphs that we use to represent a categorical/discrete variable, by saying categorical, we mean a variable that can take a limited/specific elements on it.
-for example: today you have an exam, we can make some variable from today:
-1) Binary variable: you will pass the exam, or not.
-2) Categorical variable: the day(e.g. Sunday...), exam hour(e.g. 9:00, 13:30, 17:00...)
-And it's also reasonable to add a third data type: Discrete data.
-3) Discrete variables: the number of hours that you slept before the exam, the number of questions in the exam..
+Bar plot is a kind of graphs that we use to represent a categorical(also binary, ordinal)/discrete variable.
+1. By saying binary, we mean a variable that can take only two elements.(such as: you live in USA, or you don't).
+2. By saying categorical, we mean a variable that can take a [3,] elements on it(3+),(such as: )
+3. By saying ordinal, we mean a categorical variable that has an order(such as: rating a book from 1-5).
+4. By saying discrete, we mean a  countable/integer variable.(such as: the number of students in a class, shoe size, number of languages that you can talk, the number of questions in an exam...)
+
+Data structure in R: 
+1. factor: for binary, categorical, ordinal variables(we can also include discrete variables).
+2. integer: for discrete variables. note: I think that it's better to plot a discrete variable with a factor str(structure).
+
+
+I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
+note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
 
 So, let's start.
 
-loading the libraries.
-I will try to use only ggplot2 functions, except if the alternative is much easier, and less code to write. 
-plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
+Loading the libraries, and getting the data.
 ```{r, message = FALSE, warning = FALSE}
 library(ggplot2)
 library(priceR)
@@ -49,13 +54,15 @@ travel$FamilyMembers <- as.factor(travel$FamilyMembers)
 usd_inr <- historical_exchange_rates("INR", to = "USD", start_date = "2019-01-01", end_date = "2019-12-31")[,2]
 travel$AnnualIncome <- travel$AnnualIncome*mean(usd_inr) #from INR currency to USD.
 ```
-We will focus on plots, and will use just a couple of variable from travel dataset.
+We will focus on plots, and will use just a couple of variables from travel dataset.
 
 ```{r}
 str(travel)
 ```
-the variable that I used from the dataset:
-1) TravelInsurance: a binary variable.
+The variables that I used from the dataset:
+1) TravelInsurance: binary variable.
+2) EverTravelledAbroad: binary variable.
+3) FamilyMembers: discrete variable.
 
 ## a reminder.
 If you forget one day how to make plot with ggplot2(Please don't...), then you have to remember that you have to pass these three:

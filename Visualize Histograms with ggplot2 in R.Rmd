@@ -1,0 +1,113 @@
+---
+title: "EDA - Histograms"
+author: "Khaled Sobeh"
+date: "5/5/2022"
+output: html_document
+---
+
+Data Visualization: Histograms / continuous data types 
+
+
+Histogram is a kind of graphs that we use to represent a continuous variable.
+1. By saying continuous, we mean a variable that can any value in an interval(such as: height, acceleration, length, time, temperature, age...), it's a quantitative variable that we can summarize.
+
+Data structure in R: 
+1. integer.
+2. numeric.
+
+
+I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
+note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
+
+So, let's start.
+
+Loading the libraries, and getting the data.
+```{r, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(priceR)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(ISLR)
+```
+
+```{r}
+auto <- Auto
+auto$origin <- as.factor(auto$origin)
+auto$cylinders <- as.factor(auto$cylinders)
+auto <- select(auto, -name)
+```
+```{r}
+str(auto)
+```
+
+The variables that I used from the dataset:
+1) acceleration: binary variable.
+2) EverTravelledAbroad: binary variable.
+3) FamilyMembers: discrete variable.
+
+## a reminder.
+If you forget one day how to make plot with ggplot2(Please don't...), then you have to remember that you have to pass these three:
+1) ggplot(and_here_the_dataset_name)
+2) aes(x = the_variable_name_that_you_want_to_visualize, y = sec_col...)
+you can pass this aes thing(you should remember this) in ggplot() or geom_..() function.
+3) geom_ the_plot_that_you_want: geom_bar(), geom_boxplot().....
+so you should have:
+ggplot(travel,aes(acceleration)) + geom_bar() |or| ggplot(travel) + geom_bar(aes(acceleration))
+
+
+## The most basic histogram:
+```{r}
+ggplot(auto,aes(acceleration)) + geom_histogram()
+```
+
+we can also set the aesthetic in the geom function:
+```{r}
+ggplot(auto) + geom_histogram(aes(acceleration))
+```
+
+```{r}
+plot_grid(ggplot(auto,aes(acceleration)) + geom_histogram(),
+          ggplot(auto) + geom_histogram(aes(acceleration)))
+```
+
+
+geom_histogram parameters:
+```{r, fig.width=10,fig.height=11, message = FALSE}
+
+plot_grid(ggplot(auto, aes(acceleration)) + geom_histogram(bins = 10) + ggtitle("bins = 10"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(bins = 50) + ggtitle("bins = 50"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 0.3) + ggtitle("alpha = 0.3"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 1) + ggtitle("alpha = 1"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(color = 'lightblue') + ggtitle("color = 'lightblue'"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(color = '#FFDB6D') + ggtitle("color = #FFDB6D"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(fill = 'lightblue') + ggtitle("fill = 'lightblue'"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(fill = '#FFDB6D') + ggtitle("fill = #FFDB6D"),
+          #ggplot(auto, aes(acceleration)) + geom_histogram() + ggtitle(""),
+          #ggplot(auto, aes(acceleration)) + geom_histogram() + ggtitle(""),
+          ncol = 2)
+```
+
+
+
+
+
+
+
+
+
+```{r, message = FALSE}
+GGally::ggpairs(select(auto,-c(origin,cylinders)))
+```
+
+
+
+
+
+
+
+
+
+
+
+
