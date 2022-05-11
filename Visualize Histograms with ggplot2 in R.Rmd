@@ -42,9 +42,7 @@ str(auto)
 ```
 
 The variables that I used from the dataset:
-1) acceleration: binary variable.
-2) EverTravelledAbroad: binary variable.
-3) FamilyMembers: discrete variable.
+1) acceleration: continuous variable.
 
 ## a reminder.
 If you forget one day how to make plot with ggplot2(Please don't...), then you have to remember that you have to pass these three:
@@ -66,7 +64,7 @@ we can also set the aesthetic in the geom function:
 ggplot(auto) + geom_histogram(aes(acceleration))
 ```
 
-```{r}
+```{r, message=FALSE}
 plot_grid(ggplot(auto,aes(acceleration)) + geom_histogram(),
           ggplot(auto) + geom_histogram(aes(acceleration)))
 ```
@@ -89,19 +87,52 @@ plot_grid(ggplot(auto, aes(acceleration)) + geom_histogram(bins = 10) + ggtitle(
 ```
 
 
+### change font size...
+change font size:
+```{r, fig.width=10,fig.height=11, message=FALSE}
+h0 <- ggplot(auto,aes(acceleration)) + geom_histogram()
+plot_grid(h0 + theme(text=element_text(size=20)) + ggtitle('text=element_text(size=20)'),
+          h0 + ggtitle('text=element_text(size=NULL)'),
+          h0 + theme(axis.text=element_text(size=20)) + ggtitle('axis.text=element_text(size=20)'),
+          h0 + ggtitle('axis.text=element_text(size=NULL)'),
+          h0 + theme(axis.title=element_text(size=20)) + ggtitle('axis.title=element_text(size=20)'),
+          h0 + ggtitle('axis.title=element_text(size=NULL)'),
+          h0 + theme(plot.title=element_text(size=20)) + ggtitle('plot.title=element_text(size=20)'),
+          h0 + ggtitle('plot.title=element_text(size=NULL)'),
+          ncol = 2)
+```
 
 
+### add title, rename labs...
+now we will gonna add a title, change x and y names. We have two options:
+1)
+```{r, message=FALSE}
+A <-  h0 + labs(x = 'x label', y = 'y label', title = 'A plot')
+##
+B <- h0 + xlab('x label') + ylab('y label') + ggtitle('B plot')
+plot_grid(A,B)
+```
+
+other useful stuff with labs function:
+2)
+```{r}
+h0 + labs(title = 'p title', subtitle = 'p subtitle', tag = 'p0')
+```
 
 
-
-
-
-```{r, message = FALSE}
-GGally::ggpairs(select(auto,-c(origin,cylinders)))
+### change axis limits.
+change x axis limits:
+```{r}
+h0 +  scale_x_continuous(limits=c(min(auto$acceleration),max(auto$acceleration)), #future use: just change df$col
+                         breaks=seq(min(auto$acceleration),max(auto$acceleration),1)) #you can change the by(100)
 ```
 
 
 
+Bivariate graph: showing the relationship between two variables.
+```{r, message = FALSE}
+GGally::ggpairs(select(auto,-c(origin,cylinders)))
+```
 
 
 
