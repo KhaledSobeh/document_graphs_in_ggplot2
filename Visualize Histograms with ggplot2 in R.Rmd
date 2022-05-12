@@ -15,6 +15,9 @@ Data structure in R:
 1. integer.
 2. numeric.
 
+Histograms
+with histograms we can check if the "pattern" of a variable ,if the variable is: "symmetric", "skewed left" or "right", "unimodal"(normally distributed), "bimodal" or "multimodal". 
+
 
 I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
 note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
@@ -54,6 +57,8 @@ so you should have:
 ggplot(travel,aes(acceleration)) + geom_bar() |or| ggplot(travel) + geom_bar(aes(acceleration))
 
 
+
+
 ## The most basic histogram:
 ```{r}
 ggplot(auto,aes(acceleration)) + geom_histogram()
@@ -70,11 +75,31 @@ plot_grid(ggplot(auto,aes(acceleration)) + geom_histogram(),
 ```
 
 
+### bins and binwidth
+bins control the number of bins('bars')
+binwidth control the width of the bins by x axis
+
+more clear example: a contiuous variable: values between 1 and 100([1,100]):
+```{r}
+set.seed(1)
+df <- data.frame(col_1 = purrr::rdunif(1000,1,100))
+```
+
+```{r}
+plot_grid(ggplot(df,aes(col_1)) + geom_histogram(bins = 5, fill = "lightblue", colour = "black") +
+            ggtitle('bins = 5') + scale_x_continuous(),
+          ggplot(df,aes(col_1)) + geom_histogram(binwidth = 20, fill = "lightblue", colour = "black") +
+            ggtitle('binwidth = 5'))
+```
+
+
 geom_histogram parameters:
 ```{r, fig.width=10,fig.height=11, message = FALSE}
 
 plot_grid(ggplot(auto, aes(acceleration)) + geom_histogram(bins = 10) + ggtitle("bins = 10"),
           ggplot(auto, aes(acceleration)) + geom_histogram(bins = 50) + ggtitle("bins = 50"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(binwidth = 2) + ggtitle("binwidth = 2"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(binwidth = 7) + ggtitle("binwidth = 7"),
           ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 0.3) + ggtitle("alpha = 0.3"),
           ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 1) + ggtitle("alpha = 1"),
           ggplot(auto, aes(acceleration)) + geom_histogram(color = 'lightblue') + ggtitle("color = 'lightblue'"),
