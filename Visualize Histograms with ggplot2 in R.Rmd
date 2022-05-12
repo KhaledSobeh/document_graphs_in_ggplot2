@@ -163,10 +163,24 @@ GGally::ggpairs(select(auto,-c(origin,cylinders)))
 ```
 
 
+```{r}
+h0
+```
+
+```{r}
+plot_grid(ggplot(auto,aes(acceleration)) + geom_boxplot() +  xlab("") +
+            theme(aspect.ratio=1/10,  panel.border = element_blank()) + coord_fixed(),
+          h0,
+          ncol = 1)
+```
 
 
 
-
+```{r, fig.width=8, fig.height=1}
+ggplot(auto,aes(acceleration)) + geom_boxplot() + 
+  #theme(aspect.ratio=1/10,  panel.spacing  = element_blank()) +
+        coord_fixed()
+```
 
 
 
