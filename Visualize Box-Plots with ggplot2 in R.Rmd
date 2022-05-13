@@ -1,0 +1,98 @@
+---
+title: "DA - Box-Plots"
+author: "Khaled Sobeh"
+date: "13/5/2022"
+output: html_document
+---
+
+Data Visualization: Box-Plots / continuous data types 
+
+
+Box Plot is a kind of graphs that we use to represent a continuous variable.
+1. By saying continuous, we mean a variable that can any value in an interval(such as: height, acceleration, length, time, temperature, age...), it's a quantitative variable that we can summarize.
+
+Data structure in R: 
+1. integer.
+2. numeric.
+
+Box-Plots
+Box-Plots is visualization for a statistical measures of the data:
+- Q1: the lower(first) quartile
+- median
+- Q3: the upper(third) quartile
+- Maximum value: = Q3 + 1.5*IQR
+- Minimum value: = Q1 - 1.5*IQR
+- Outliers: data points Beyond Maximum/Minumum values
+
+I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
+note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
+
+So, let's start.
+
+Loading the libraries, and getting the data.
+```{r, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(priceR)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(ISLR)
+```
+
+```{r}
+auto <- Auto
+auto$origin <- as.factor(auto$origin)
+auto$cylinders <- as.factor(auto$cylinders)
+auto <- select(auto, -name)
+```
+```{r}
+str(auto)
+```
+
+
+the most basic box-plot:
+```{r, message=FALSE}
+plot_grid(ggplot(auto,aes(acceleration)) + geom_boxplot(),
+          ggplot(auto) + geom_boxplot(aes(acceleration)))
+```
+
+```{r}
+summary(auto$acceleration)
+```
+
+
+rotate the box-plot:
+```{r, message=FALSE}
+plot_grid(ggplot(auto,aes(y = acceleration)) + geom_boxplot(),
+          ggplot(auto,aes(x = acceleration)) + geom_boxplot())
+```
+
+geom_boxplot parameters:
+```{r, fig.width=10,fig.height=11, message = FALSE}
+plot_grid(
+          ggplot(auto, aes(acceleration)) + geom_boxplot(alpha = 0.3) + ggtitle("alpha = 0.3"),
+          ggplot(auto, aes(acceleration)) + geom_boxplot(alpha = 1) + ggtitle("alpha = 1"),
+          ggplot(auto, aes(acceleration)) + geom_boxplot(color = 'lightblue') + ggtitle("color = 'lightblue'"),
+          ggplot(auto, aes(acceleration)) + geom_boxplot(color = '#FFDB6D') + ggtitle("color = #FFDB6D"),
+          ggplot(auto, aes(acceleration)) + geom_boxplot(fill = 'lightblue') + ggtitle("fill = 'lightblue'"),
+          ggplot(auto, aes(acceleration)) + geom_boxplot(fill = '#FFDB6D') + ggtitle("fill = #FFDB6D"),
+          #ggplot(auto, aes(acceleration)) + geom_boxplot() + ggtitle(""),
+          #ggplot(auto, aes(acceleration)) + geom_boxplot() + ggtitle(""),
+          ncol = 2)
+```
+
+add the average:
+```{r}
+ggplot(auto,aes(x = acceleration, y = factor(0))) + geom_boxplot() +
+  #stat_summary(fun.x="mean")
+  stat_summary(fun.x=mean, geom="point", shape=20, size=14, color="red", fill="red")
+```
+
+
+
+
+```{r}
+ggplot(auto,aes(x = acceleration)) + geom_boxplot() + geom_dotplot(binwidth = 1/10)
+```
+
+
