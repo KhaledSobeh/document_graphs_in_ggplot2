@@ -12,3 +12,4 @@ To be clear, you can find:
  2) for continuous variables:
   - Histograms: make a basic histogram, change geom_histogram default parameters(e.g. labels names, axis limits), add(e.g. title), axis scaling and more.
   - Box-Plots: make a basic box-plot, change geom_boxplot default parameters(e.g. labels names, axis limits), add(e.g. title), axis scaling and more.
+  - Density-Plots: make a basic density-plot, change geom_density default parameters, add plot(e.g. title), add average line and more.

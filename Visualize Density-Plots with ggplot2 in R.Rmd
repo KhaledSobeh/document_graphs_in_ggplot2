@@ -1,0 +1,114 @@
+---
+title: "DA - Density Plots"
+author: "Khaled Sobeh"
+date: "5/5/2022"
+output: html_document
+---
+
+Data Visualization: Density Plots / continuous data types 
+
+
+Density Plots is a kind of graphs that we use to represent a continuous variable.
+1. By saying continuous, we mean a variable that can any value in an interval(such as: height, acceleration, length, time, temperature, age...), it's a quantitative variable that we can summarize.
+
+Data structure in R: 
+1. integer.
+2. numeric.
+
+Density Plots
+- with Density Plots we can check if the "pattern" of a variable ,if the variable is: "symmetric", "skewed left" or "right", "unimodal"(normally distributed), "bimodal" or "multimodal". 
+- a nice chose when we have too many data.
+
+How it's work?
+1. put each data point, and add a Gaussian density kernel for each one.
+2. sum the kernels together.
+
+I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
+note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
+
+So, let's start.
+
+Loading the libraries, and getting the data.
+```{r, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(priceR)
+library(dplyr)
+library(forcats)
+library(cowplot)
+library(ISLR)
+```
+
+```{r}
+auto <- Auto
+auto$origin <- as.factor(auto$origin)
+auto$cylinders <- as.factor(auto$cylinders)
+auto <- select(auto, -name)
+```
+```{r}
+str(auto)
+```
+
+
+```{r, message=FALSE}
+plot_grid(ggplot(auto,aes(acceleration)) + geom_density(),
+          ggplot(auto) + geom_density(aes(acceleration)))
+```
+
+Important settings in density plots:
+```{r}
+plot_grid(ggplot(auto,aes(acceleration)) + geom_density(bw = 5) + ggtitle('bw = 5'),
+          ggplot(auto,aes(acceleration)) + geom_density(bw = 15) + ggtitle('bw = 15'))
+```
+
+```{r}
+ggplot(auto,aes(acceleration)) + geom_density() + geom_rug()
+```
+
+geom_density parameters: alpha, color, fill, group, linetype, size, weight
+```{r, fig.width=10,fig.height=11, message = FALSE}
+
+plot_grid(ggplot(auto, aes(acceleration)) + geom_density(alpha = 0.3) + ggtitle("alpha = 0.3"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(alpha = 1, size = 1) + ggtitle("alpha = 1, size = 1"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(color = 'lightblue', size = 1) + ggtitle("color = 'lightblue', size = 1"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(color = '#FFDB6D', size = 1) + ggtitle("color = #FFDB6D, size = 1"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(fill = 'lightblue') + ggtitle("fill = 'lightblue'"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(fill = 'green') + ggtitle("fill = green"),
+          
+          ggplot(auto, aes(acceleration)) + geom_density(linetype = "dashed",color="darkblue",size = 1) +
+            ggtitle("linetype = 'dashed', color='darkblue', size = 1"),
+          #ggplot(auto, aes(acceleration)) + geom_density() + ggtitle(""),
+          ncol = 2)
+```
+
+
+add mean line:
+```{r}
+ggplot(auto, aes(acceleration)) + geom_density(alpha = 1, size = 1, fill = '#E69E80')  +
+  geom_vline(aes(xintercept=mean(acceleration)), color="blue", linetype="dashed", size=1)
+```
+
+
+
+
+
+
+
+
+```{r}
+ggplot(auto, aes(x=weight)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill = "cyan3") 
+```
+
+
+
+
+
+References:
+https://stat-lu.github.io/dataviz/
+http://www.sthda.com/english/wiki/ggplot2-density-plot-quick-start-guide-r-software-and-data-visualization

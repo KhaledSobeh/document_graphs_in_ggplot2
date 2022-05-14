@@ -64,7 +64,10 @@ summary(auto$acceleration)
 rotate the box-plot:
 ```{r, message=FALSE}
 plot_grid(ggplot(auto,aes(y = acceleration)) + geom_boxplot(),
-          ggplot(auto,aes(x = acceleration)) + geom_boxplot())
+          ggplot(auto,aes(x = acceleration)) + geom_boxplot(),
+          qplot(y = acceleration,data =  auto, geom="boxplot"),
+          qplot(x = acceleration,data =  auto, geom="boxplot"),
+          ncol = 2)
 ```
 
 geom_boxplot parameters:
@@ -82,11 +85,21 @@ plot_grid(
 ```
 
 add the average:
+and shape, size
 ```{r}
-ggplot(auto,aes(x = acceleration, y = factor(0))) + geom_boxplot() +
-  #stat_summary(fun.x="mean")
-  stat_summary(fun.x=mean, geom="point", shape=20, size=14, color="red", fill="red")
+plot_grid(ggplot(auto,aes(x = acceleration, y = factor(0))) + geom_boxplot() + labs(tag = 'A') +
+  stat_summary(fun.x=mean, geom="point", shape=23, size=7, fill="lightblue"),
+  
+  ggplot(auto,aes(y = acceleration, x = 0)) + geom_boxplot() + labs(tag = 'B') +
+  stat_summary(fun.y=mean, geom="point", shape=20, size=5, color="red", fill="red"),
+  
+  ggplot(auto,aes(y = acceleration, x = 0)) + geom_boxplot() + labs(tag = 'C') +
+  stat_summary(fun.y=mean, geom="point", shape=22, size=5, color="red", fill="black"),
+  
+  ggplot(auto,aes(y = acceleration, x = 0)) + geom_boxplot() + labs(tag = 'D') +
+  stat_summary(fun.y=mean, geom="point", shape=2, size=5, color="lightgreen", fill="red"))
 ```
+
 
 
 
@@ -94,5 +107,86 @@ ggplot(auto,aes(x = acceleration, y = factor(0))) + geom_boxplot() +
 ```{r}
 ggplot(auto,aes(x = acceleration)) + geom_boxplot() + geom_dotplot(binwidth = 1/10)
 ```
+
+```{r}
+ggplot(auto,aes(x = acceleration)) + geom_boxplot() + geom_dotplot(binwidth = 1/10) + coord_flip()
+```
+
+
+```{r}
+ggplot(auto,aes(x = acceleration, y = factor(0))) + geom_boxplot() +
+  geom_dotplot(binwidth = 1/5)  +
+  stat_summary(fun.x=mean, geom="point", shape=23, size=5, fill="lightblue")
+```
+
+
+
+, stackdir = "center"
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(auto) + 
+  geom_boxplot(aes(x = acceleration, y = factor(0))) +
+  geom_dotplot(aes(x = acceleration), binwidth = 1/5, alpha = 0.2, stackdir = "down")  + 
+  geom_density(aes(x = acceleration), size = 1) + 
+  stat_summary(aes(x = acceleration, y = factor(0)),fun.x=mean, geom="point", shape=23, size=3, fill="lightblue") +
+  stat_summary(aes(x = acceleration, y = factor(0), label = paste("average=", round(..x.., digits = 1))), fun.x = mean, geom = "text", col = "blue", vjust = 2.5) +
+  theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank())
+```
+
+
+```{r}
+plot_continuous <- function(df, xcol){
+  ggplot(df) + 
+    geom_boxplot(aes(x = xcol, y = factor(0))) +
+  geom_dotplot(aes(x = xcol), binwidth = 1/5, alpha = 0.2, stackdir = "down")  + 
+  geom_density(aes(x = xcol), size = 1) + 
+  stat_summary(aes(x = xcol, y = factor(0)),fun.x=mean, geom="point", shape=23, size=3, fill="lightblue") +
+  stat_summary(aes(x = xcol, y = factor(0), label = paste("average=", round(..x.., digits = 1))), fun.x = mean, geom = "text", col = "blue", vjust = 2.5) +
+  theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+    coord_cartesian(ylim = c(-1,1))
+}
+```
+```{r}
+plot_continuous(auto,auto$mpg)
+```
+
+
+```{r}
+ggplot(auto) + 
+  geom_histogram(aes(x = mpg)) +
+  #geom_dotplot(aes(x = mpg), alpha = 0.2)  + 
+  geom_density(aes(x = mpg), size = 1)
+```
+
+
+
+different types of boxplot:
+```{r}
+ggplot(auto, aes(y = mpg)) + geom_boxplot(notch = TRUE) + ggtitle('notch = TRUE')
+```
+
+
+for a few data you can use:
+```{r}
+ggplot(auto, aes(x = mpg)) + geom_dotplot(binwidth = 1/1.5) + ggtitle('dotplot') + guides(y = "none")
+```
+
+for a lot data you can use:
+```{r}
+ggplot(auto, aes(y = mpg, x = 1)) + geom_violin() + ggtitle('violin')
+```
+
+
+
+
+
+
+
+
+References:
+http://www.sthda.com/english/wiki/be-awesome-in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data-visualization
+
+
+
 
 
