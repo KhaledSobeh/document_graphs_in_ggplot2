@@ -16,13 +16,40 @@ Data structure in R:
 2. numeric.
 
 Box-Plots
-Box-Plots is visualization for a statistical measures of the data:
+Box-Plots is a visualization for statistical measures of the data:
 - Q1: the lower(first) quartile
-- median
+- median(Q2)
 - Q3: the upper(third) quartile
 - Maximum value: = Q3 + 1.5*IQR
 - Minimum value: = Q1 - 1.5*IQR
 - Outliers: data points Beyond Maximum/Minumum values
+note: IQR = Q3 - Q1
+```{r, echo=FALSE}
+auto <- ISLR::Auto
+sum_acc <- summary(auto$acceleration)
+```
+```{r, echo=FALSE}
+ggplot(auto) + 
+  geom_boxplot(aes(y = acceleration, x = factor(0))) + 
+  annotate(geom="text", x=factor(0), y=sum_acc[3] + 0.5, 
+           label="median", color="#E69F00") +
+  annotate(geom="text", x=factor(0), y=sum_acc[2] + 0.5,
+           label="1st Quartile                     ", color="#E69F00") +
+  annotate(geom="text", x=factor(0), y=sum_acc[5]+ 0.5,
+           label="3rd Quartile                     ", color="#E69F00") +
+  annotate(geom="text", x=factor(0) , y=(sum_acc[2] - 1.5*(sum_acc[5]-sum_acc[2])) + 0.5,
+           label="Q1 - 1.5*IQR                          ", color="#E69F00") +
+  annotate(geom="text", x=factor(0) , y=(sum_acc[2] - 1.5*(sum_acc[5]-sum_acc[2])) + 0.5,
+           label="_____________                         ", color="#E69F00") +
+  annotate(geom="text", x=factor(0), y=(sum_acc[5] + 1.5*(sum_acc[5]-sum_acc[2])) + 0.2,
+           label="Q3 + 1.5*IQR                          ", color="#E69F00") +
+  annotate(geom="text", x=factor(0), y=(sum_acc[5] + 1.5*(sum_acc[5]-sum_acc[2])) + 0.2,
+           label="_____________                         ", color="#E69F00") +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
+  theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) + 
+  ggtitle("Box-Plot:")
+```
+
 
 I will try to use only ggplot2 functions, except if the alternative is much easier, with much less code to write. 
 note: plot_grid() function will be used a lot. I used it just to combine plots, as we shall see.
