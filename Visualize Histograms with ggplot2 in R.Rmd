@@ -102,12 +102,15 @@ plot_grid(ggplot(auto, aes(acceleration)) + geom_histogram(bins = 10) + ggtitle(
           ggplot(auto, aes(acceleration)) + geom_histogram(binwidth = 7) + ggtitle("binwidth = 7"),
           ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 0.3) + ggtitle("alpha = 0.3"),
           ggplot(auto, aes(acceleration)) + geom_histogram(alpha = 1) + ggtitle("alpha = 1"),
-          ggplot(auto, aes(acceleration)) + geom_histogram(color = 'lightblue') + ggtitle("color = 'lightblue'"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(color = 'lightblue') + 
+            ggtitle("color = 'lightblue'"),
           ggplot(auto, aes(acceleration)) + geom_histogram(color = '#FFDB6D') + ggtitle("color = #FFDB6D"),
           ggplot(auto, aes(acceleration)) + geom_histogram(fill = 'lightblue') + ggtitle("fill = 'lightblue'"),
           ggplot(auto, aes(acceleration)) + geom_histogram(fill = '#FFDB6D') + ggtitle("fill = #FFDB6D"),
-          #ggplot(auto, aes(acceleration)) + geom_histogram() + ggtitle(""),
-          #ggplot(auto, aes(acceleration)) + geom_histogram() + ggtitle(""),
+          ggplot(auto, aes(acceleration)) + geom_histogram(linetype="dashed", fill = 'pink') +
+            ggtitle("linetype='dashed', fill = 'pink'"),
+          ggplot(auto, aes(acceleration)) + geom_histogram(color = 'red', fill = 'blue', linetype='dashed') +
+            ggtitle("color = 'red', fill = 'blue', linetype='dashed'"),
           ncol = 2)
 ```
 
@@ -153,22 +156,61 @@ h0 +  scale_x_continuous(limits=c(min(auto$acceleration),max(auto$acceleration))
 ```
 
 
-now you can add avg line...
-
-
-
-Bivariate graph: showing the relationship between two variables.
-```{r, message = FALSE}
-GGally::ggpairs(select(auto,-c(origin,cylinders)))
+average line
+```{r}
+ggplot(auto, aes(acceleration)) + geom_histogram(fill = '#E69E80')  +
+  geom_vline(aes(xintercept=mean(acceleration)), color="blue", linetype="dashed", size=1)
 ```
 
 
+## Bivariate Histograms - with second categorical variable.
 ```{r}
-h0
+plot_grid(ggplot(auto, aes(acceleration, color = origin)) + geom_histogram() + ggtitle('color'),
+          ggplot(auto, aes(acceleration, fill = origin)) + geom_histogram() + ggtitle('fill') +
+  scale_fill_brewer(palette="Dark2"))
 ```
 
+### average line by group
 ```{r}
+df <- auto %>% group_by(origin) %>% summarise(acceleration = mean(acceleration)) %>% as.data.frame()
+```
+```{r}
+ggplot(data = auto, aes(acceleration, fill = origin)) + geom_histogram() + ggtitle('fill') +
+  geom_vline(data = df, aes(xintercept=acceleration, color = origin), linetype="dashed", size=1) +
+    scale_fill_grey() + scale_color_manual(values =  c('blue','yellow','green'))
+```
+
+### facet
+
+#### facet grid
+```{r,  fig.width=9,fig.height=5, message = FALSE}
+plot_grid(
+  ggplot(auto, aes(acceleration, fill = origin)) + geom_histogram() +
+            ggtitle('facet_grid(origin ~ .)') + facet_grid(origin ~ .),
+  
+  ggplot(auto, aes(acceleration, color = origin)) + geom_histogram() + 
+    ggtitle('facet_grid(. ~ origin)') + facet_grid(. ~ origin)
+)
+```
+
+#### facet wrap
+```{r,  fig.width=9,fig.height=5, message = FALSE}
+plot_grid(
+  ggplot(auto, aes(acceleration, fill = origin)) + geom_histogram() +
+            ggtitle('facet_wrap(origin ~ .)') + facet_wrap(origin ~ .),
+  
+  ggplot(auto, aes(acceleration, color = origin)) + geom_histogram() + 
+    ggtitle('facet_wrap( ~ origin)') + facet_wrap( ~ origin, ncol = 2)
+)
+```
+
+
+
+
+
+```{r,  fig.width=6,fig.height=3, message=FALSE}
 plot_grid(ggplot(auto,aes(acceleration)) + geom_boxplot() +  xlab("") +
+            ggtitle("Histogram and Box-Plot") + theme(plot.title = element_text(hjust = 0.4)) +
             theme(aspect.ratio=1/10,  panel.border = element_blank()) + coord_fixed(),
           h0,
           ncol = 1)
@@ -176,10 +218,10 @@ plot_grid(ggplot(auto,aes(acceleration)) + geom_boxplot() +  xlab("") +
 
 
 
-```{r, fig.width=8, fig.height=1}
-ggplot(auto,aes(acceleration)) + geom_boxplot() + 
-  #theme(aspect.ratio=1/10,  panel.spacing  = element_blank()) +
-        coord_fixed()
+
+Bivariate graph: showing the relationship between two variables.
+```{r, message = FALSE}
+GGally::ggpairs(select(auto,-c(origin,cylinders)))
 ```
 
 
