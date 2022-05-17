@@ -208,9 +208,19 @@ change colors:
 ggplot(travel,aes(TravelInsurance)) + geom_bar(fill = 'lightblue',color = 'black')
 ```
 you can choose any color you want to. link to more colors: https://rstudio-pubs-static.s3.amazonaws.com/5312_98fc1aba2d5740dd849a5ab797cc2c8d.html
+or run: RColorBrewer::display.brewer.all()
+```{r, fig.width=7,fig.height=8}
+RColorBrewer::display.brewer.all()
+```
 
+  
 
-
+color the bars by count
+```{r}
+ggplot(travel,aes(x = as.factor(FamilyMembers), fill = as.factor(..count..))) + geom_bar() +
+  scale_fill_brewer(palette="YlOrRd") + labs(x = "FamilyMembers", title = ' fill = as.factor(..count..)')
+```
+  
 
 ### set the order.
 reorder the bars by count:

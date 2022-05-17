@@ -29,7 +29,8 @@ auto <- ISLR::Auto
 sum_acc <- summary(auto$acceleration)
 ```
 ```{r, echo=FALSE}
-ggplot2::ggplot(auto) + 
+library(ggplot2)
+ggplot(auto) + 
   geom_boxplot(aes(y = acceleration, x = 1), outlier.alpha = 1, outlier.color = 'red') + 
   annotate(geom="text", x=1, y=sum_acc[3] + 0.5, # text for median
            label="median", color="#E69F00", family = "serif", fontface = "italic", size = 5) +
